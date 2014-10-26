@@ -8,6 +8,7 @@ import (
    "encoding/json"
    "github.com/mitchellh/go-homedir"
    "io/ioutil"
+   "log"
 )
 
 
@@ -35,6 +36,18 @@ func setCredentials(user,key string) {
 	fmt.Printf("Credentials written to %s.\n", HOME_DIR + "/" + CREDENTIAL_FILE)
 }
 
+// Get the credentials
+func getCredentials() Credentials {
+   var c Credentials
+   // Grab the contents of the section
+   creds, err := ioutil.ReadFile(HOME_DIR + "/" + CREDENTIAL_FILE)
+   if err != nil {
+      log.Fatal(err)
+   }
+   err = json.Unmarshal(creds, &c)
+   return c
+}
+
 
 // Kicks off a build
 func build() {
@@ -49,6 +62,12 @@ func login() {
 	fmt.Print("Enter your API key: ")
 	key, _ := reader.ReadString('\n')
 	setCredentials(user[:len(user)-1],key[:len(key)-1])
+}
+
+// Displays the user's info
+func whoami() {
+	c := getCredentials()
+	fmt.Printf("You are %s.\n", c.User)
 }
 
 
@@ -77,6 +96,12 @@ func main() {
          },
       },   
       {
+         Name:  "whoami",
+         Usage: "Display your login/API credentials",
+         Action: func(c *cli.Context) {
+	        whoami()
+         },
+      },      {
 	     Name: "build",
 	     Usage: "Build a project",
          Flags: []cli.Flag {
