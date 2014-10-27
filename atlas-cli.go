@@ -9,6 +9,7 @@ import (
    "github.com/mitchellh/go-homedir"
    "io/ioutil"
    "log"
+   "time"
 )
 
 
@@ -21,64 +22,73 @@ type Credentials struct {
 
 var HOME_DIR, _ =  homedir.Dir()
 var CREDENTIAL_FILE = ".atlas.json"
+var atlas_user Credentials
 
 
-// Set the user credentials
-func setCredentials(user,key string) {
-	c := Credentials{user,key}
-	out, _ := json.Marshal(c)
+// Get the users login credentials and save them to "~/.atlas.json" for the next time
+func login() Credentials {
 
-    err := ioutil.WriteFile( HOME_DIR + "/" + CREDENTIAL_FILE, out, 0644)
-    if err != nil {
-       panic(err)
-    }
-
-	fmt.Printf("Credentials written to %s.\n", HOME_DIR + "/" + CREDENTIAL_FILE)
-}
-
-// Get the credentials
-func getCredentials() Credentials {
-   var c Credentials
-   // Grab the contents of the section
-   creds, err := ioutil.ReadFile(HOME_DIR + "/" + CREDENTIAL_FILE)
-   if err != nil {
-      log.Fatal(err)
-   }
-   err = json.Unmarshal(creds, &c)
-   return c
-}
-
-
-// Kicks off a build
-func build() {
-	fmt.Println("I'm building!")
-}
-
-// Reads the users login credentials and saves them in ~/.atlas
-func login() {
+    // Prompt the user for his or her credentials
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter your Atlas user name: ")
 	user, _ := reader.ReadString('\n')
 	fmt.Print("Enter your API key: ")
 	key, _ := reader.ReadString('\n')
-	setCredentials(user[:len(user)-1],key[:len(key)-1])
+	
+	// Save the credentials to a ~/.atlas.json
+	c := Credentials{user[:len(user)-1],key[:len(key)-1]}
+	out, _ := json.Marshal(c)
+    err := ioutil.WriteFile( HOME_DIR + "/" + CREDENTIAL_FILE, out, 0644)
+    if err != nil {
+       panic(err)
+    }
+
+    //let the user know!
+	fmt.Printf("Credentials written to %s.\n", HOME_DIR + "/" + CREDENTIAL_FILE)
+	
+	return c
+	
 }
 
-// Displays the user's info
-func whoami() {
-	c := getCredentials()
-	fmt.Printf("You are %s.\n", c.User)
+
+// Kicks off a build
+func build( c *cli.Context ) {
+	
+	
+	fmt.Printf("I'm building a file for %s...\n", atlas_user.User)
+	fmt.Println(c.String("branch"))
+	for i:=1; i < 13; i++ {
+       fmt.Print(".")	
+	   time.Sleep(250 * time.Millisecond)
+    }
+	fmt.Println()
+
+	fmt.Printf("Now I'm done.\n")
 }
 
+// List all the builds in a project
+func list() {
+	fmt.Println("I'm listing your builds...")
+}
 
-// key actions are login and build
-// login should ask you for your token and then save it to a file where you can get it later
-// build should build -- it needs flags for format, project name, and branch
 
 
 func main() {
 	
-   fmt.Println(HOME_DIR + "/" + CREDENTIAL_FILE)
+   // First we try to fetch the users credentials from "~/.atlas.json".  If they are in there, we use those.
+   //  Otherwise, we prompt the user and set them
+   credsJSON, err := ioutil.ReadFile(HOME_DIR + "/" + CREDENTIAL_FILE)
+   if err == nil {
+      err = json.Unmarshal(credsJSON, &atlas_user)
+      // doublecheck to make sure nothing went wrong
+      if err != nil {
+	     log.Fatal(err)
+      }
+   } else {
+      atlas_user = login()
+   }
+  
+   // Start the "real" program
 
    app := cli.NewApp()
    app.Name = "atlas-cli"
@@ -92,23 +102,31 @@ func main() {
          Name:  "login",
          Usage: "Provide your login/API credentials",
          Action: func(c *cli.Context) {
-	        login()
+	        atlas_user = login()
          },
       },   
       {
          Name:  "whoami",
          Usage: "Display your login/API credentials",
          Action: func(c *cli.Context) {
-	        whoami()
+	        fmt.Printf("You are %s.\n", atlas_user.User)
          },
-      },      {
+      },
+      {
 	     Name: "build",
 	     Usage: "Build a project",
          Flags: []cli.Flag {
             cli.StringFlag{
 		       Name: "project, p",
-		       Value: "project",
 		       Usage: " project to build",
+		    },
+            cli.BoolFlag{
+		       Name: "pdf",
+		       Usage: " build a pdf",
+		    },
+            cli.BoolFlag{
+		       Name: "html",
+		       Usage: " build html format",
 		    },
 		    cli.StringFlag{
 		       Name: "branch, b",
@@ -117,9 +135,17 @@ func main() {
 		    },
 	     },
 	     Action: func(c *cli.Context) {
-		    build()
+		    build(c)
 	     },
-      },	
+      },
+      {
+	     Name: "list",
+	     Usage: "List builds of a project",
+         Action: func(c *cli.Context) {
+            list()
+         },
+	  },
+	
    }
 
   app.Run(os.Args)
