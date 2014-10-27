@@ -10,19 +10,33 @@ import (
    "io/ioutil"
    "log"
    "time"
+   "net/http"
 )
 
 
-// These are the main auth credentials
+// Define API auth credentials structure
 type Credentials struct {
    User string
    Key  string
 }
 
+// Defines the payload of the build API
+type Builds struct {
+	Build_url string `json:"build_url"`
+	Status []struct {
+		Format         string `json:"format"`
+		Status         string `json:"status"`
+		Download_url   string `json:"download_url"`
+		Message        string `json:"message"`
+	} `json:"status"`
+}
 
-var HOME_DIR, _ =  homedir.Dir()
-var CREDENTIAL_FILE = ".atlas.json"
-var atlas_user Credentials
+
+// Declare package level vairables
+
+var HOME_DIR, _ =  homedir.Dir()     //the users home directory where we'll put the credentials
+var CREDENTIAL_FILE = ".atlas.json"  //the name of the credentials file
+var atlas_user Credentials           //the data structure w/the users API credentials
 
 
 // Get the users login credentials and save them to "~/.atlas.json" for the next time
@@ -53,8 +67,6 @@ func login() Credentials {
 
 // Kicks off a build
 func build( c *cli.Context ) {
-	
-	
 	fmt.Printf("I'm building a file for %s...\n", atlas_user.User)
 	fmt.Println(c.String("branch"))
 	for i:=1; i < 13; i++ {
@@ -66,11 +78,43 @@ func build( c *cli.Context ) {
 	fmt.Printf("Now I'm done.\n")
 }
 
-// List all the builds in a project
-func list() {
-	fmt.Println("I'm listing your builds...")
+// thanks for this great post: http://www.codingcookies.com/2013/03/21/consuming-json-apis-with-go/
+func getBuildStatus(url string) (Builds, error) {
+    // At this point we're done 
+    var builds Builds
+
+    // Build the request
+    req, err := http.NewRequest("GET", url, nil)
+    if err != nil {
+      return builds, err
+    }
+    // Send the request via a client
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+      return builds, err
+    }
+    // Defer the closing of the body
+    defer resp.Body.Close()
+    // Read the content into a byte array
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+      return builds, err
+    }
+
+    err = json.Unmarshal(body, &builds)
+    return builds, err
 }
 
+
+
+// List all the builds in a project
+func list() {
+	fmt.Println("I'm listing your builds!")
+	url := fmt.Sprintf("https://atlas.oreilly.com/api/builds/1?auth_token=%s", atlas_user.Key)
+	builds, _ := getBuildStatus(url)
+	fmt.Println(builds)
+}
 
 
 func main() {
