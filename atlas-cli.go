@@ -11,6 +11,8 @@ import (
    "log"
    "time"
    "net/http"
+   "net/url"
+   "strings"
 )
 
 
@@ -23,6 +25,7 @@ type Credentials struct {
 // Defines the payload of the build API
 type Builds struct {
 	Build_url string `json:"build_url"`
+	Message string `json:message`
 	Status []struct {
 		Format         string `json:"format"`
 		Status         string `json:"status"`
@@ -65,26 +68,63 @@ func login() Credentials {
 }
 
 
-// Kicks off a build
+// Kicks off a build by sending a POST request to Atlas
 func build( c *cli.Context ) {
 	fmt.Printf("I'm building a file for %s...\n", atlas_user.User)
-	fmt.Println(c.String("branch"))
-	for i:=1; i < 13; i++ {
+	
+	// the project must be the first argument
+	project := c.Args().First()
+	if len(project) == 0 {
+		log.Fatal("You must supply a project name.")
+	}
+	
+	//process the format flags they've requested
+	formats := make([]string, 0)
+	for _,f := range []string{"pdf", "html", "epub", "mobi"} {
+       if c.Bool(f) { formats = append(formats, f) } 		
+	}
+	// if they haven't entered any formats, the build a PDF by default
+	if len(formats) == 0 {formats = append(formats, "pdf") }
+
+	
+	// Build the URL that we'll need to post to Atlas
+	var Url *url.URL	
+	Url, _ = url.Parse("https://atlas.oreilly.com/api/builds")
+	parameters := url.Values{}
+	parameters.Add("branch", c.String("branch"))
+	parameters.Add("project", atlas_user.User + "/" + project)
+	parameters.Add("format", strings.Join(formats,","))
+	parameters.Add("auth_token", atlas_user.Key)
+	Url.RawQuery = parameters.Encode()
+	
+	
+    // post the request	
+
+    fmt.Println(Url.String())
+
+	builds, _ := getBuildStatus(Url.String(), "POST")
+	fmt.Println(builds)
+	
+	fmt.Println()
+	for i:=1; i < 5; i++ {
        fmt.Print(".")	
-	   time.Sleep(250 * time.Millisecond)
+	   time.Sleep(100 * time.Millisecond)
     }
 	fmt.Println()
 
 	fmt.Printf("Now I'm done.\n")
 }
 
+
+
+
 // thanks for this great post: http://www.codingcookies.com/2013/03/21/consuming-json-apis-with-go/
-func getBuildStatus(url string) (Builds, error) {
+func getBuildStatus(url, request_type string) (Builds, error) {
     // At this point we're done 
     var builds Builds
 
     // Build the request
-    req, err := http.NewRequest("GET", url, nil)
+    req, err := http.NewRequest(request_type, url, nil)
     if err != nil {
       return builds, err
     }
@@ -112,7 +152,7 @@ func getBuildStatus(url string) (Builds, error) {
 func list() {
 	fmt.Println("I'm listing your builds!")
 	url := fmt.Sprintf("https://atlas.oreilly.com/api/builds/1?auth_token=%s", atlas_user.Key)
-	builds, _ := getBuildStatus(url)
+	builds, _ := getBuildStatus(url, "GET")
 	fmt.Println(builds)
 }
 
