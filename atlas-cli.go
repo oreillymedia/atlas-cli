@@ -140,6 +140,8 @@ func buildAndPoll(c *cli.Context) {
    for _,s := range build_status.Status {
       if s.Status == "completed" {
          fmt.Printf("%s => %s\n", s.Format, s.Download_url)
+      } else {
+         fmt.Printf("%s => %s\n", s.Format, "Failed to build")
       }
    }
 
@@ -168,8 +170,9 @@ func main() {
    app := cli.NewApp()
    app.Name = "atlas-cli"
    app.Usage = "Atlas commandline API!"
+   app.Version = "0.0.1-alpha"
    app.Action = func(c *cli.Context) {
-     println("Hello friend!")
+     fmt.Println("Nothing to do.  Try `help` or `-h` to see what's possible.")
    }
 
    app.Commands = []cli.Command{
@@ -191,10 +194,6 @@ func main() {
 	     Name: "build",
 	     Usage: "Build a project",
          Flags: []cli.Flag {
-            cli.StringFlag{
-		       Name: "project, p",
-		       Usage: " project to build",
-		    },
             cli.BoolFlag{
 		       Name: "pdf",
 		       Usage: " build a pdf",
