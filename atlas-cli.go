@@ -68,93 +68,84 @@ func login() Credentials {
 }
 
 
-// Kicks off a build by sending a POST request to Atlas
-func build( c *cli.Context ) {
-	fmt.Printf("I'm building a file for %s...\n", atlas_user.User)
+// kick off a build for the project
+func buildAndPoll(c *cli.Context) {
 	
-	// the project must be the first argument
-	project := c.Args().First()
-	if len(project) == 0 {
-		log.Fatal("You must supply a project name.")
-	}
+   // the project must be the first argument
+   project := c.Args().First()
+   if len(project) == 0 {
+      log.Fatal("You must supply a project name.")
+   }
 	
-	//process the format flags they've requested
-	formats := make([]string, 0)
-	for _,f := range []string{"pdf", "html", "epub", "mobi"} {
-       if c.Bool(f) { formats = append(formats, f) } 		
-	}
-	// if they haven't entered any formats, the build a PDF by default
-	if len(formats) == 0 {formats = append(formats, "pdf") }
+   //process the format flags they've requested
+   formats := make([]string, 0)
+   for _,f := range []string{"pdf", "html", "epub", "mobi"} {
+      if c.Bool(f) { formats = append(formats, f) } 		
+   }
+   // if they haven't entered any formats, the build a PDF by default
+   if len(formats) == 0 {formats = append(formats, "pdf") }
 
-	
-	// Build the URL that we'll need to post to Atlas
-	var Url *url.URL	
-	Url, _ = url.Parse("https://atlas.oreilly.com/api/builds")
-	parameters := url.Values{}
-	parameters.Add("branch", c.String("branch"))
-	parameters.Add("project", atlas_user.User + "/" + project)
-	parameters.Add("format", strings.Join(formats,","))
-	parameters.Add("auth_token", atlas_user.Key)
-	Url.RawQuery = parameters.Encode()
-	
-	
-    // post the request	
 
-    fmt.Println(Url.String())
+   fmt.Print("Working")
 
-	builds, _ := getBuildStatus(Url.String(), "POST")
-	fmt.Println(builds)
-	
-	fmt.Println()
-	for i:=1; i < 5; i++ {
-       fmt.Print(".")	
-	   time.Sleep(100 * time.Millisecond)
-    }
-	fmt.Println()
+		
+   resp, err := http.PostForm("https://atlas.oreilly.com/api/builds",
+      url.Values{
+        "project": {project}, 
+        "auth_token": {atlas_user.Key},
+        "branch": {c.String("branch")},
+        "formats": {strings.Join(formats,",")},
+   })
+   if err != nil {
+      log.Fatal(err)
+   }
+   defer resp.Body.Close()
 
-	fmt.Printf("Now I'm done.\n")
+
+   // Read the results from the build request
+   body, err := ioutil.ReadAll(resp.Body)
+   var builds Builds
+   err = json.Unmarshal(body, &builds)
+
+   build_url := fmt.Sprintf("https://atlas.oreilly.com%s?auth_token=%s", builds.Build_url, atlas_user.Key)
+
+   // now poll the build and see how it's doing
+   var build_status Builds
+   for {
+	   resp, err = http.Get(build_url);
+	   if err != nil {
+	      log.Fatal(err)
+	   }
+	   defer resp.Body.Close()
+	   // Read the results from the build request
+	   body, err = ioutil.ReadAll(resp.Body)
+	   err = json.Unmarshal(body, &build_status)
+	   // now process the reuturn value.  We should stop polling when all status values
+	   // are either "completed" or "failed"
+	   completed_count := 0
+       for _,s := range build_status.Status {
+          if (s.Status == "completed") || (s.Status == "failed") {
+             completed_count += 	1
+          }
+       } 
+       if completed_count == len(build_status.Status) {
+          break;
+       }
+       fmt.Print(".")     
+	   time.Sleep(500 * time.Millisecond)	
+   }
+   fmt.Println();
+
+   // Now print the build info
+   for _,s := range build_status.Status {
+      if s.Status == "completed" {
+         fmt.Printf("%s => %s\n", s.Format, s.Download_url)
+      }
+   }
+
 }
 
 
-
-
-// thanks for this great post: http://www.codingcookies.com/2013/03/21/consuming-json-apis-with-go/
-func getBuildStatus(url, request_type string) (Builds, error) {
-    // At this point we're done 
-    var builds Builds
-
-    // Build the request
-    req, err := http.NewRequest(request_type, url, nil)
-    if err != nil {
-      return builds, err
-    }
-    // Send the request via a client
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-      return builds, err
-    }
-    // Defer the closing of the body
-    defer resp.Body.Close()
-    // Read the content into a byte array
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-      return builds, err
-    }
-
-    err = json.Unmarshal(body, &builds)
-    return builds, err
-}
-
-
-
-// List all the builds in a project
-func list() {
-	fmt.Println("I'm listing your builds!")
-	url := fmt.Sprintf("https://atlas.oreilly.com/api/builds/1?auth_token=%s", atlas_user.Key)
-	builds, _ := getBuildStatus(url, "GET")
-	fmt.Println(builds)
-}
 
 
 func main() {
@@ -212,24 +203,24 @@ func main() {
 		       Name: "html",
 		       Usage: " build html format",
 		    },
-		    cli.StringFlag{
+            cli.BoolFlag{
+		       Name: "epub",
+		       Usage: " build epub format",
+		    },
+            cli.BoolFlag{
+		       Name: "mobi",
+		       Usage: " build mobi format",
+		    },
+            cli.StringFlag{
 		       Name: "branch, b",
 		       Value: "master",
 		       Usage: "branch to build",
 		    },
 	     },
 	     Action: func(c *cli.Context) {
-		    build(c)
+		    buildAndPoll(c)
 	     },
       },
-      {
-	     Name: "list",
-	     Usage: "List builds of a project",
-         Action: func(c *cli.Context) {
-            list()
-         },
-	  },
-	
    }
 
   app.Run(os.Args)
