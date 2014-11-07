@@ -73,12 +73,41 @@ func main() {
 			},
 		},
 		{
-			Name: "grant",
-			Usage: "Grant a user a permission on a project ID (admin only)",
-			Action: func(c *cli.Context) {
-				grant := &Grant{}
-				grant.ParseArgs(c)
-				grant.Grant()
+			Name: "product",
+			Usage: "Product metadata and ownership server (requires admin access)",
+			Subcommands: []cli.Command{
+				{
+					Name: "grant",		
+					Usage: "Grant a user a permission on a project ID (admin only)",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name: "oracle_id, id",
+							Usage: "Product ID (oracle id)",
+						},
+						cli.StringFlag{
+							Name: "email, e",
+							Usage: "Email address of grantee",
+						},
+					},
+					Action: func(c *cli.Context) {
+						p := &Product{}
+						p.Grant(c)
+					},
+				},
+				{
+					Name: "find",
+					Usage: "Search for project info",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name: "title, t",
+							Usage: "Search by title (must be at least 5 chars long)",
+						},
+					},
+					Action: func(c *cli.Context){
+						f := &Product{}
+						f.Find(c)
+					},
+				},
 			},
 		},
 	}
