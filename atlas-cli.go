@@ -72,6 +72,15 @@ func main() {
 				build.Build(*atlas_user, *args)
 			},
 		},
+		{
+			Name: "grant",
+			Usage: "Grant a user a permission on a project ID (admin only)",
+			Action: func(c *cli.Context) {
+				grant := &Grant{}
+				grant.ParseArgs(c)
+				grant.Grant()
+			},
+		},
 	}
 
 	app.Run(os.Args)
