@@ -16,18 +16,26 @@ var CREDENTIAL_FILE = ".atlas.json" //the name of the credentials file
 type Credentials struct {
 	User string
 	Key  string
+	JanrainClientID string
+	JanrainClientSecret string
+}
+
+// Fetch a value
+func prompt(s string) string {
+	// Prompt the user for his or her credentials
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Printf("%s: ", s)
+	val, _ := reader.ReadString('\n')
+	val = val[:len(val)-1]
+	return val
 }
 
 // Get the users login credentials and save them to "~/.atlas.json" for the next time
 func (c *Credentials) Query() {
-	// Prompt the user for his or her credentials
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter your Atlas user name: ")
-	c.User, _ = reader.ReadString('\n')
-	c.User = c.User[:len(c.User)-1]
-	fmt.Print("Enter your API key: ")
-	c.Key, _ = reader.ReadString('\n')
-	c.Key = c.Key[:len(c.Key)-1]
+	c.User = prompt("Enter your Atlas user name")
+	c.Key = prompt("Enter your Atlas key")
+	c.JanrainClientID = prompt("Enter your JanRain client ID (hit enter to skip)")
+	c.JanrainClientSecret = prompt("Enter your JanRain client secret (hit enter to skip)")
 }
 
 // Save the credentials to ~/.atlas.json

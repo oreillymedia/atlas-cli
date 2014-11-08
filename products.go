@@ -21,6 +21,15 @@ type Product struct {
 	} `json:"data"`
 }
 
+
+// Define a janrain user
+type JanRainUser struct {
+	Results []struct {
+		UUID string `json:"uuid"`
+		Email string `json:"email"`
+	} `json:"results"`
+}
+
 // pads a string to be N chars long
 func pad(s string, N int) string {
 	if len(s) > N {
@@ -32,10 +41,35 @@ func pad(s string, N int) string {
 }
 
 
-func (p *Product) Grant(c *cli.Context) {
-	product_id := c.String("oracle_id")
-	email := c.String("email")
-	fmt.Printf("Granting %s permission to %s\n", product_id, email)
+func (j *JanRainUser) Find(c Credentials, email string) {
+	//find the users UUID in JanRain
+    query := url.Values{
+		"client_id":    {c.JanrainClientID},
+		"client_secret": {c.JanrainClientSecret},
+		"type_name": {"user"},
+		"filter": {"email='" + email + "'"},
+	}	
+	
+	resp, err := http.PostForm("https://oreilly.janraincapture.com/entity.find", query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &j)
+	
+}
+
+func (p *Product) Grant(c Credentials, args *cli.Context) {
+	//product_id := args.String("oracle_id")
+	email := args.String("email")
+    
+	fmt.Println("Working...")
+	janrain := JanRainUser{}
+	janrain.Find(c, email)
+	fmt.Println(janrain)
+	
+
 }
 
 
