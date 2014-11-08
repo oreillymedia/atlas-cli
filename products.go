@@ -35,10 +35,15 @@ func pad(s string, N int) string {
 
 
 func (p *Product) Grant(args *cli.Context) {
-	//product_id := args.String("oracle_id")
-	email := args.String("email")
+	
+	if len(args.Args()) != 2 {
+		log.Fatal("You must supply an oracle id and a user email")
+	}
+	
+	oracle_id := args.Args().Get(0)
+	email := args.Args().Get(1)
     
-	fmt.Println("Working...")
+	fmt.Printf("Granting %s to %s...\n", oracle_id, email)
 	janrain := JanRainUser{}
 	janrain.Find(email)
 	fmt.Println(janrain)
