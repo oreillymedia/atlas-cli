@@ -91,7 +91,7 @@ func main() {
 					},
 					Action: func(c *cli.Context) {
 						p := &Product{}
-						p.Grant(*atlas_user, c)
+						p.Grant(c)
 					},
 				},
 				{

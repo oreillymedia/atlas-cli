@@ -52,10 +52,11 @@ func (c *Credentials) Load() error {
 	credsJSON, err := ioutil.ReadFile(HOME_DIR + "/" + CREDENTIAL_FILE)
 	if err == nil {
 		err = json.Unmarshal(credsJSON, &c)
+		if err != nil { return err }
 	} else {
 		return err
 	}
-	return nil
+	return err
 }
 
 //do the login
