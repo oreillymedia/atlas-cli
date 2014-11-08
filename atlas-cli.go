@@ -15,7 +15,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "atlas-cli"
 	app.Usage = "Atlas commandline API!"
-	app.Version = "0.0.2-alpha"
+	app.Version = "0.0.3-alpha"
 	app.Action = func(c *cli.Context) {
 		fmt.Println("Nothing to do.  Try `help` or `-h` to see what's possible.")
 	}
