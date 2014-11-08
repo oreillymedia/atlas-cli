@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"io/ioutil"
 	"strings"
+	"bytes"
 )
 
 //Define a Product interfacce that will mostly have methods
@@ -20,6 +21,12 @@ type Product struct {
 	} `json:"data"`
 }
 
+
+type Ownership struct {
+	Grantor string `json:"grantor"`
+	Customer string `json:"customer"`
+	Product string `json:"product"` 
+} 
 
 
 // pads a string to be N chars long
@@ -52,12 +59,28 @@ func (p *Product) Grant(args *cli.Context) {
 	// Find the grantor's Janrain UUID
 	grantor := JanrainUser{}
 	grantor.Find(creds.JanrainEmail)
-	fmt.Println(grantor.Results[0].UUID)
 	
 	// Find the grantee's Janrain UUID
 	grantee := JanrainUser{}
 	grantee.Find(email)
-	fmt.Println(grantee.Results[0].UUID)
+
+	
+	// Make ownership JSON that we'll post
+	ownership_rec := Ownership{ grantor.Results[0].UUID, grantee.Results[0].UUID, oracle_id }
+
+	post_data := make(map[string]Ownership)
+	post_data["ownership"] = ownership_rec
+	ownership_rec_json, _ := json.Marshal(post_data)
+	
+
+	resp, err := http.Post("http://api.oreilly.com/ownership-service/v1/ownerships", "text/json", bytes.NewBuffer(ownership_rec_json))
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
 
 }
 
