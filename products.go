@@ -44,9 +44,20 @@ func (p *Product) Grant(args *cli.Context) {
 	email := args.Args().Get(1)
     
 	fmt.Printf("Granting %s to %s...\n", oracle_id, email)
-	janrain := JanRainUser{}
-	janrain.Find(email)
-	fmt.Println(janrain)
+	
+	// Load the credentials that we'll use to set the grantor in the ownership service
+	creds := Credentials{}
+	creds.Load()
+	
+	// Find the grantor's Janrain UUID
+	grantor := JanrainUser{}
+	grantor.Find(creds.JanrainEmail)
+	fmt.Println(grantor.Results[0].UUID)
+	
+	// Find the grantee's Janrain UUID
+	grantee := JanrainUser{}
+	grantee.Find(email)
+	fmt.Println(grantee.Results[0].UUID)
 
 }
 

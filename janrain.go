@@ -10,7 +10,7 @@ import (
 
 
 // Define a janrain user
-type JanRainUser struct {
+type JanrainUser struct {
 	Results []struct {
 		UUID string `json:"uuid"`
 		Email string `json:"email"`
@@ -18,7 +18,7 @@ type JanRainUser struct {
 }
 
 
-func (j *JanRainUser) Find(email string) {
+func (j *JanrainUser) Find(email string) {
 	
 	c := &Credentials{}
 	c.Load()
