@@ -10,7 +10,7 @@ import (
 )
 
 var HOME_DIR, _ = homedir.Dir()     //the users home directory where we'll put the credentials
-var CREDENTIAL_FILE = ".atlas.json" //the name of the credentials file
+var CREDENTIAL_FILE = ".oreilly.json" //the name of the credentials file
 
 // Define API auth credentials structure
 type Credentials struct {
