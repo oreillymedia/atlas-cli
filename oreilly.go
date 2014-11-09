@@ -13,8 +13,8 @@ func main() {
 	// Start the "real" program
 
 	app := cli.NewApp()
-	app.Name = "oreilly-cli"
-	app.Usage = "OºReilly commandline API!"
+	app.Name = "oreilly"
+	app.Usage = "OºReilly command line API"
 	app.Version = "0.0.3-alpha"
 	app.Action = func(c *cli.Context) {
 		fmt.Println("Nothing to do.  Try `help` or `-h` to see what's possible.")
@@ -112,6 +112,34 @@ func main() {
 					Action: func(c *cli.Context){
 						f := &Product{}
 						f.Find(c)
+					},
+				},
+			},
+		},
+		{
+			Name: "sites",
+			Usage: "Publish an Atlas project to sites.oreilly.com",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name: "public",
+					Usage: "Make project public",
+				},
+			},
+			Subcommands: []cli.Command{
+				{
+					Name: "open",
+					Usage: "Open a site",
+					Action: func(c *cli.Context){
+						s := &Sites{}
+						s.Open(c)
+					},
+				},
+				{
+					Name: "publish",
+					Usage: "Publish a site",
+					Action: func(c *cli.Context){
+						s := &Sites{}
+						s.Publish(c)
 					},
 				},
 			},
