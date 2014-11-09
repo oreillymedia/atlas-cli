@@ -119,16 +119,16 @@ func main() {
 		{
 			Name: "sites",
 			Usage: "Publish an Atlas project to sites.oreilly.com",
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name: "public",
-					Usage: "Make project public",
-				},
-			},
 			Subcommands: []cli.Command{
 				{
 					Name: "open",
 					Usage: "Open a site",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name: "public",
+							Usage: "Make project public",
+						},
+					},
 					Action: func(c *cli.Context){
 						s := &Sites{}
 						s.Open(c)
@@ -137,6 +137,12 @@ func main() {
 				{
 					Name: "publish",
 					Usage: "Publish a site",
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name: "public",
+							Usage: "Make project public",
+						},
+					},
 					Action: func(c *cli.Context){
 						s := &Sites{}
 						s.Publish(c)
