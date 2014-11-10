@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"strings"
 	"bytes"
+	"net"
+	"time"
 )
 
 //Define a Product interfacce that will mostly have methods
@@ -39,9 +41,19 @@ func pad(s string, N int) string {
 	
 }
 
+// Tests if api.oreilly.com is reachable.  If it's not, it exits immeditely
+func testConnection() {
+	_, err := net.DialTimeout("tcp", "api.oreilly.com:80", time.Duration(750)*time.Millisecond)
+	if err != nil {
+		log.Fatal("Can't reach api.oreilly.com.  Maybe you need to VPN in?")
+	}
+}
+
 
 
 func (p *Product) Grant(args *cli.Context) {
+	
+	testConnection()
 	
 	if len(args.Args()) != 2 {
 		log.Fatal("You must supply an oracle id and a user email")
@@ -86,6 +98,9 @@ func (p *Product) Grant(args *cli.Context) {
 
 
 func (product *Product) Find(c *cli.Context) {
+	
+	testConnection()
+		
 	term := c.Args().First()
 	if len(term) < 3 {
 		log.Fatal("Your title must contain at least 3 characters.")
