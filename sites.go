@@ -27,9 +27,9 @@ func (s *Sites) Open(c *cli.Context) {
 		log.Fatal("You must supply a project name")
 	}
 		
-	url := fmt.Sprintf("http://orm-static-site-proxy.herokuapp.com/%s", project)
+	url := fmt.Sprintf("http://orm-static-site-proxy.herokuapp.com/%s/ch01.html", project)
 	if c.Bool("public") {
-		url = fmt.Sprintf("http://sites.oreilly.com/%s", project)		
+		url = fmt.Sprintf("http://sites.oreilly.com/%s/ch01.html", project)		
 	}
 	fmt.Printf("Opening %s\n", url)
 	webbrowser.Open(url)
