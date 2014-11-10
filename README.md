@@ -1,51 +1,45 @@
-# Atlas CLI
+# O'Reilly CLI
 
-A Go-based implementation of the Atlas command line gem.  Here's the top-level help: 
+A Go-based oreilly API client.  Here's the top-level help: 
 
 ```
-
-$ atlas-cli help
+$ oreilly help
 
 NAME:
-   atlas-cli - Atlas commandline API!
+   oreilly - OºReilly command line API
 
 USAGE:
-   atlas-cli [global options] command [command options] [arguments...]
+   oreilly [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.0
+   0.0.4-alpha
 
 COMMANDS:
-   login	Provide your login/API credentials
+   login	Set your login/API credentials
    whoami	Display your login/API credentials
-   build	Build a project
+   atlas	Work with Atlas projects
+   product	Product metadata and ownership server (requires admin access)
+   sites	Publish an Atlas project to sites.oreilly.com
    help, h	Shows a list of commands or help for one command
    
 GLOBAL OPTIONS:
    --help, -h		show help
    --version, -v	print the version
-```
 
-Here's the build.  The first argument is the project name (remember to include your username)
 
 ```
-$ atlas-cli help build 
-NAME:
-   build - Build a project
 
-USAGE:
-   command build [command options] [arguments...]
+With this command, you can do things like this:
 
-OPTIONS:
-   --pdf			 build a pdf
-   --html			 build html format
-   --epub			 build epub format
-   --mobi			 build mobi format
-   --branch, -b 'master'	branch to build
 
-$ atlas-cli build odewahn/dds-field-guide --pdf --html
-Working.........................
-html => http://orm-atlas2-prod.s3.amazonaws.com/html/45c3725bb1dd3d4bcfa1a6d8e3145235.zip
-pdf => http://orm-atlas2-prod.s3.amazonaws.com/pdf/418cbd43e30057818ff33aff1a8962c7.pdf
+* `oreilly atlas build odewahn/dds-field-guide --html`
 
-```
+* `oreilly sites publish odewahn/dds-field-guide --public`
+
+* `oreilly sites open odewahn/dds-field-guide --public`
+
+* `oreilly product find "go programming"`
+
+* `oreilly product grant 9781491913871.VIDEO rune@runemadsen.com`
+
+
