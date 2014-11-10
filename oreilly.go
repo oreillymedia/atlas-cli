@@ -103,12 +103,6 @@ func main() {
 				{
 					Name: "find",
 					Usage: "Search for project info",
-					Flags: []cli.Flag{
-						cli.StringFlag{
-							Name: "title, t",
-							Usage: "Search by title (must be at least 5 chars long)",
-						},
-					},
 					Action: func(c *cli.Context){
 						f := &Product{}
 						f.Find(c)

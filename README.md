@@ -43,3 +43,14 @@ With this command, you can do things like this:
 * `oreilly product grant 9781491913871.VIDEO rune@runemadsen.com`
 
 
+## Building
+
+To build, do this:
+
+```
+go build -o oreilly *.go
+```
+
+## Installation
+
+Put the `oreilly` binary somewhere on your path, and BOOM!  You're ready to go. 
