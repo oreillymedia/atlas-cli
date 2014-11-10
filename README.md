@@ -29,6 +29,12 @@ GLOBAL OPTIONS:
 
 ```
 
+## Installation
+
+Put the `oreilly` binary somewhere on your path, and BOOM!  You're ready to go.
+
+## Usage 
+
 With this command, you can do things like this:
 
 
@@ -51,6 +57,3 @@ To build, do this:
 go build -o oreilly *.go
 ```
 
-## Installation
-
-Put the `oreilly` binary somewhere on your path, and BOOM!  You're ready to go. 
