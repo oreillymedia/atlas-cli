@@ -71,11 +71,16 @@ func (p *Product) Grant(args *cli.Context) {
 	// Find the grantor's Janrain UUID
 	grantor := JanrainUser{}
 	grantor.Find(creds.JanrainEmail)
+	if len(grantor.Results) == 0 {
+		log.Fatal("Cannot find grantor " + creds.JanrainEmail + ".  Maybe they need to create an account on oreilly.com?")
+	}
 	
 	// Find the grantee's Janrain UUID
 	grantee := JanrainUser{}
 	grantee.Find(email)
-
+	if len(grantee.Results) == 0 {
+		log.Fatal("Cannot find grantee " + email + ".  Maybe they need to create an account on oreilly.com?")
+	}
 	
 	// Make ownership JSON that we'll post
 	ownership_rec := Ownership{ grantor.Results[0].UUID, grantee.Results[0].UUID, oracle_id }

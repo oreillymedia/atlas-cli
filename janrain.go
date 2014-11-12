@@ -37,6 +37,7 @@ func (j *JanrainUser) Find(email string) {
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	
 	err = json.Unmarshal(body, &j)
 	
 }
