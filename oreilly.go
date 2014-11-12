@@ -15,7 +15,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "oreilly"
 	app.Usage = "OºReilly command line API"
-	app.Version = "0.0.4-alpha"
+	app.Version = "0.0.5-alpha"
 	app.Action = func(c *cli.Context) {
 		fmt.Println("Nothing to do.  Try `help` or `-h` to see what's possible.")
 	}
