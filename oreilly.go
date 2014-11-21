@@ -139,7 +139,7 @@ func main() {
 					},
 					Action: func(c *cli.Context){
 						s := &Sites{}
-						s.Publish(c)
+						s.Publish(atlas_user , c)
 					},
 				},
 			},

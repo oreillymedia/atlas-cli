@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+
+
 // Defines the payload of the build API
 type Builds struct {
 	Build_url string `json:"build_url"`
@@ -24,12 +26,49 @@ type Builds struct {
 	} `json:"status"`
 }
 
+type ProjectBuilds []struct{
+	Id        int    `json:"id"`
+    CreatedAt string  `json:"created_at"`
+    Status    []struct {
+	   Format string `json:"format"`
+    } `json:"status"`
+}
+
+
 // Hold the parameters for a build
 type BuildArgs struct {
 	Project string
 	Formats string
 	Branch  string
 }
+
+
+// This function returns the builds for the project
+// It uses the structure defined in builds.go
+
+func (builds *ProjectBuilds) Get(user *Credentials, project string) {
+	
+	qry := url.Values{
+			"project":    {project},
+			"auth_token":  {user.Key},
+	}
+	
+	resp, err := http.Get("https://atlas.oreilly.com/api/builds?" + qry.Encode() )
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	
+	// Read the results from the build request
+	body, err := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &builds)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+}
+
 
 func (args *BuildArgs) Parse(c *cli.Context) {
 
