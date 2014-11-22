@@ -5,33 +5,28 @@ import (
 	"github.com/codegangsta/cli"
 	"log"
 	"github.com/toqueteos/webbrowser"
-//	"net/url"
-//	"io/ioutil"
-//	"net/http"
+	"net/url"
+	"io/ioutil"
+	"net/http"
 //	"encoding/json"
 )
 
 
 type Sites struct {
-
+	Id int `json:"id"`
+	URL string `json:"url"`
+	state string `json:"state"`
 }
 
 
-
-
-func (s *Sites) Publish(user *Credentials, c *cli.Context) {
-	project := c.Args().First()
-	if len(project) == 0 {
-		log.Fatal("You must supply a project name")
-	}
+//Find the first build with an HTML build
+func getBuildId(user *Credentials, project string) int {
 	
-	builds := &ProjectBuilds{}
-	
+	// Fetch the build data itself form the atlas api
+	builds := &ProjectBuilds{}	
 	builds.Get(user, project)
-	
-	fmt.Printf("Publishing %s for %s once Rune makes an API\n", project, user.User)
-	
-	//Find the first build with an HTML build
+		
+	// loop though each build  and build-> status till we find the first html build
 	build_id := -1
 	for _, b := range *builds {
 		for _,s := range b.Status {
@@ -46,7 +41,49 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 			break
 		}
 	}
-	fmt.Println(build_id)
+	// if we don't find the build id then we need to error out
+	if build_id == -1 {
+		log.Fatal("Cannot find an html build for " + project)
+	}
+	return build_id
+}
+
+
+
+func (s *Sites) Publish(user *Credentials, c *cli.Context) {
+
+	// Get the project name
+	project := c.Args().First()
+	if len(project) == 0 {
+		log.Fatal("You must supply a project name")
+	}
+
+	// Get the visibility level
+	bucket_type := "private"
+	if c.Bool("public") {
+		bucket_type = "public"
+	}
+	
+	// get the build ID
+	build_id := getBuildId(user,project)
+	
+	// Now hit the API endpoint to publish the build to sites
+	resp, err := http.PostForm("http://web-publisher.atlas.oreilly.com/deploy",
+		url.Values{
+			"build_id": {string(build_id)},
+			"s3_path": {project},
+			"bucket_type": {bucket_type},
+			"token": {user.Key},
+		})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	// Read the results from the build request
+	body, err := ioutil.ReadAll(resp.Body)
+		
+	fmt.Println(string(body))
 	
 }
 
