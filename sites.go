@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"io/ioutil"
 	"net/http"
+//	"net/http/httputil"
 //	"encoding/json"
 )
 
@@ -79,7 +80,7 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-
+	
 	// Read the results from the build request
 	body, err := ioutil.ReadAll(resp.Body)
 		
