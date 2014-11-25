@@ -9,15 +9,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-//	"net/http/httputil"
-//	"encoding/json"
+	"encoding/json"
+	"time"
 )
 
 
 type Sites struct {
 	Id int `json:"id"`
 	URL string `json:"url"`
-	state string `json:"state"`
+	State string `json:"state"`
 }
 
 
@@ -52,8 +52,22 @@ func getBuildId(user *Credentials, project string) int {
 
 
 // Gets the status of the build with the given id
-func get_status (id int) string {
+func get_state(id int) string {
 	
+	url := fmt.Sprintf("http://web-publisher.atlas.oreilly.com/deploy/%d", id)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	// Read the results from the build request
+	body, err := ioutil.ReadAll(resp.Body)
+
+	var s Sites
+	err = json.Unmarshal(body, &s)
+	
+	return s.State
+		
 }
 
 
@@ -64,6 +78,8 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 	if len(project) == 0 {
 		log.Fatal("You must supply a project name")
 	}
+	
+	fmt.Print("Working")
 
 	// Get the visibility level
 	bucket_type := "private"
@@ -89,8 +105,21 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 	
 	// Read the results from the build request
 	body, err := ioutil.ReadAll(resp.Body)
-		
-	fmt.Println(string(body))
+	
+	var response Sites
+	json.Unmarshal(body, &response)
+	
+	// Now poll until the build is complete
+	for {
+		fmt.Print(".")
+		state := get_state(response.Id)
+		if (state == "complete") {
+			break
+		}
+		time.Sleep(500 * time.Millisecond)		
+	}
+
+	s.Open(c)
 	
 }
 
