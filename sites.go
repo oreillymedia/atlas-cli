@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 //	"net/http/httputil"
 //	"encoding/json"
 )
@@ -50,6 +51,11 @@ func getBuildId(user *Credentials, project string) int {
 }
 
 
+// Gets the status of the build with the given id
+func get_status (id int) string {
+	
+}
+
 
 func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 
@@ -71,7 +77,7 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 	// Now hit the API endpoint to publish the build to sites
 	resp, err := http.PostForm("http://web-publisher.atlas.oreilly.com/deploy",
 		url.Values{
-			"build_id": {string(build_id)},
+			"build_id": {strconv.Itoa(build_id)},
 			"s3_path": {project},
 			"bucket_type": {bucket_type},
 			"token": {user.Key},
