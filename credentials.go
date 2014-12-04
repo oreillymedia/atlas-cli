@@ -16,9 +16,6 @@ var CREDENTIAL_FILE = ".oreilly.json" //the name of the credentials file
 type Credentials struct {
 	User string
 	Key  string
-	JanrainEmail string
-	JanrainClientID string
-	JanrainClientSecret string
 }
 
 // Fetch a value
@@ -35,15 +32,12 @@ func prompt(s string) string {
 func (c *Credentials) Query() {
 	c.User = prompt("Enter your Atlas user name")
 	c.Key = prompt("Enter your Atlas key")
-	c.JanrainEmail = prompt("Enter your JanRain email address (hit enter to skip)")
-	c.JanrainClientID = prompt("Enter your JanRain client ID (hit enter to skip)")
-	c.JanrainClientSecret = prompt("Enter your JanRain client secret (hit enter to skip)")
 }
 
 // Save the credentials to ~/.atlas.json
 func (c *Credentials) Save() {
 	out, _ := json.Marshal(c)
-	err := ioutil.WriteFile(HOME_DIR+"/"+CREDENTIAL_FILE, out, 0644)
+	err := ioutil.WriteFile(HOME_DIR+"/" + CREDENTIAL_FILE, out, 0644)
 	if err != nil {
 		panic(err)
 	}

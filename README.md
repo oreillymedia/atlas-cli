@@ -1,59 +1,59 @@
-# O'Reilly CLI
+# Atlas CLI
 
-A Go-based oreilly API client.  Here's the top-level help: 
+A Go-based Atlas API client for building projects and publishing them as a web site.
+
+Here's the top-level help: 
 
 ```
-$ oreilly help
-
 NAME:
-   oreilly - OºReilly command line API
+   atlas - OºReilly Atlas command line tool
 
 USAGE:
-   oreilly [global options] command [command options] [arguments...]
+   atlas [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.4-alpha
+   0.0.7-alpha
 
 COMMANDS:
    login	Set your login/API credentials
    whoami	Display your login/API credentials
-   atlas	Work with Atlas projects
-   product	Product metadata and ownership server (requires admin access)
-   sites	Publish an Atlas project to sites.oreilly.com
+   build	Build a project
+   open		Open a site
+   publish	Publish a site
    help, h	Shows a list of commands or help for one command
    
 GLOBAL OPTIONS:
    --help, -h		show help
    --version, -v	print the version
 
-
 ```
 
 ## Installation
 
-Put the `oreilly` binary somewhere on your path, and BOOM!  You're ready to go.
+* Download the latest release
+* Put it on your path
+* Do `chmod + x` on it
+
+Someday I'll make a packager.
+
 
 ## Usage 
 
 With this command, you can do things like this:
 
 
-* `oreilly atlas build odewahn/dds-field-guide --html`
+* `atlas build odewahn/dds-field-guide --html`
 
-* `oreilly sites publish odewahn/dds-field-guide --public`
+* `atlas publish odewahn/dds-field-guide --public`
 
-* `oreilly sites open odewahn/dds-field-guide --public`
-
-* `oreilly product find "go programming"`
-
-* `oreilly product grant 9781491913871.VIDEO rune@runemadsen.com`
+* `atlas open odewahn/dds-field-guide --public`
 
 
-## Building
+## Development
 
 To build, do this:
 
 ```
-go build -o oreilly *.go
+go build -o atlas *.go
 ```
 
