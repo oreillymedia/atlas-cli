@@ -40,6 +40,13 @@ func main() {
 			},
 		},
 		{
+			Name:  "info",
+			Usage: "Display info about your Atlas project based on the git config file",
+			Action: func(c *cli.Context) {
+				GetGitInfo()
+			},
+		},
+		{
 			Name:  "build",
 			Usage: "Build a project",
 			Flags: []cli.Flag{
