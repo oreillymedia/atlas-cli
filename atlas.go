@@ -15,7 +15,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "atlas"
 	app.Usage = "OºReilly Atlas command line tool"
-	app.Version = "0.0.7-alpha"
+	app.Version = "0.0.8-alpha"
 	app.Action = func(c *cli.Context) {
 		fmt.Println("Nothing to do.  Try `help` or `-h` to see what's possible.")
 	}
