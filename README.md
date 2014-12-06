@@ -12,11 +12,12 @@ USAGE:
    atlas [global options] command [command options] [arguments...]
 
 VERSION:
-   0.0.7-alpha
+   0.0.8-alpha
 
 COMMANDS:
    login	Set your login/API credentials
    whoami	Display your login/API credentials
+   info		Display info about your Atlas project based on the git config file
    build	Build a project
    open		Open a site
    publish	Publish a site
@@ -25,7 +26,6 @@ COMMANDS:
 GLOBAL OPTIONS:
    --help, -h		show help
    --version, -v	print the version
-
 ```
 
 ## Installation
