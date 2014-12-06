@@ -43,7 +43,7 @@ func main() {
 			Name:  "info",
 			Usage: "Display info about your Atlas project based on the git config file",
 			Action: func(c *cli.Context) {
-				GetGitInfo()
+				fmt.Printf("Your project is %s\n", GetGitInfo())
 			},
 		},
 		{
