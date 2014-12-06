@@ -73,10 +73,13 @@ func (builds *ProjectBuilds) Get(user *Credentials, project string) {
 func (args *BuildArgs) Parse(c *cli.Context) {
 
 	// the project must be the first argument
-	args.Project = c.Args().First()
-	if len(args.Project) == 0 {
-		log.Fatal("You must supply a project name.")
+	
+	if len(c.String("project")) > 0 {
+		args.Project = c.String("project")
+	} else {
+		args.Project = GetGitInfo()
 	}
+
 
 	//process the format flags they've requested
 	formats := make([]string, 0)
@@ -124,7 +127,7 @@ func (builds *Builds) Start(c Credentials, a BuildArgs) {
 
 func (builds *Builds) Build(c Credentials, a BuildArgs) {
 
-	fmt.Print("Working")
+	fmt.Printf("Building %s",a.Project)
 
 	builds.Start(c, a)
 

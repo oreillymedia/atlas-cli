@@ -73,13 +73,14 @@ func get_state(id int) string {
 
 func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 
-	// Get the project name
-	project := c.Args().First()
-	if len(project) == 0 {
-		log.Fatal("You must supply a project name")
+	project := ""
+	if len(c.String("project")) > 0 {
+		project = c.String("project")
+	} else {
+		project = GetGitInfo()
 	}
 	
-	fmt.Print("Working")
+	fmt.Printf("Publishing %s", project)
 
 	// Get the visibility level
 	bucket_type := "private"
@@ -124,9 +125,12 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 }
 
 func (s *Sites) Open(c *cli.Context) {
-	project := c.Args().First()
-	if len(project) == 0 {
-		log.Fatal("You must supply a project name")
+	
+	project := ""
+	if len(c.String("project")) > 0 {
+		project = c.String("project")
+	} else {
+		project = GetGitInfo()
 	}
 		
 	url := fmt.Sprintf("http://orm-static-site-proxy.herokuapp.com/%s/ch01.html", project)

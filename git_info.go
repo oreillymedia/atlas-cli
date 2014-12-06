@@ -1,7 +1,6 @@
 package main
 
 import (
-   "fmt"
    "code.google.com/p/gcfg"
    "log"
    "os"
@@ -61,9 +60,7 @@ func GetGitInfo() string {
 	if len(project) == 0 {
 		log.Fatal("Can't find any remotes for git.atlas.oreilly.com.")
 	}
-	
-	fmt.Println(project)
-	
+		
 	return project
 
 }

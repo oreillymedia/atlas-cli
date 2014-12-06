@@ -50,6 +50,10 @@ func main() {
 			Name:  "build",
 			Usage: "Build a project",
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "project, p",
+					Usage: "Project name",
+				},
 				cli.BoolFlag{
 					Name:  "pdf",
 					Usage: " build a pdf",
@@ -83,6 +87,10 @@ func main() {
 			Name: "open",
 			Usage: "Open a site",
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "project, p",
+					Usage: "Project name",
+				},
 				cli.BoolFlag{
 					Name: "public",
 					Usage: "Make project public",
@@ -97,6 +105,10 @@ func main() {
 			Name: "publish",
 			Usage: "Publish a site",
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name: "project, p",
+					Usage: "Project name",
+				},
 				cli.BoolFlag{
 					Name: "public",
 					Usage: "Make project public",
