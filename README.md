@@ -42,11 +42,19 @@ Someday I'll make a packager.
 With this command, you can do things like this:
 
 
-* `atlas build odewahn/dds-field-guide --html`
+* `atlas build -p odewahn/dds-field-guide --html`
 
-* `atlas publish odewahn/dds-field-guide --public`
+* `atlas publish -p odewahn/dds-field-guide --public`
 
-* `atlas open odewahn/dds-field-guide --public`
+* `atlas open -p odewahn/dds-field-guide --public`
+
+If you omit the "-p" flag, the CLI will see if it can find a project name from the remotes defined in your git config.  So, if you're in your project's home directory, you can just do this:
+
+* `atlas build --html`
+
+* `atlas publish --public`
+
+* `atlas open --public`
 
 
 ## Development
