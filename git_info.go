@@ -38,7 +38,7 @@ func GetGitInfo() string {
 	
 	err = gcfg.ReadFileInto(&c, "./.git/config")
 	if err != nil {
-		log.Fatal("Can't parse /.git/config")
+		log.Fatal("Can't parse ./.git/config")
 	}
 	
 	// look through each remote and return the one that points to an atlas project
