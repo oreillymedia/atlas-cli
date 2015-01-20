@@ -17,12 +17,14 @@ import (
 // Defines the payload of the build API
 type Builds struct {
 	Build_url string `json:"build_url"`
-	Message   string `json:message`
+	Message   string `json:"message"`
 	Status    []struct {
 		Format       string `json:"format"`
 		Status       string `json:"status"`
 		Download_url string `json:"download_url"`
-		Message      string `json:"message"`
+		Message      struct {
+			Error	string `json:"error"`
+		} `json:"message"`
 	} `json:"status"`
 }
 
@@ -166,7 +168,7 @@ func (builds *Builds) Build(c Credentials, a BuildArgs) {
 		if s.Status == "completed" {
 			fmt.Printf("%s => %s\n", s.Format, s.Download_url)
 		} else {
-			fmt.Printf("%s => %s\n", s.Format, "Failed to build")
+			fmt.Printf("%s => %s\n %s\n", s.Format, "Failed to build", s.Message.Error)
 		}
 	}
 
