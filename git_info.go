@@ -18,10 +18,12 @@ type Config struct {
 		Branch map[string]*struct {
 			Remote string
 			Origin string
+			Merge string
 		}
         Remote map[string]*struct {
                 Url string
 				Fetch string
+				Merge string
         }
 }
 
@@ -38,7 +40,8 @@ func GetGitInfo() string {
 	
 	err = gcfg.ReadFileInto(&c, "./.git/config")
 	if err != nil {
-		log.Fatal("Can't parse /.git/config")
+		log.Print(err)
+		log.Fatal("Can't parse .git/config")
 	}
 	
 	// look through each remote and return the one that points to an atlas project
