@@ -1,69 +1,54 @@
 package main
 
 import (
-   "code.google.com/p/gcfg"
-   "log"
-   "os"
-   "strings"
+	"bufio"
+	"log"
+	"os"
+	"strings"
 )
 
-type Config struct {
-	    Core struct {
-			Repositoryformatversion int
-			Filemode bool
-			Bare bool
-			Logallrefupdates bool
-			Ignorecase bool
-		}
-		Branch map[string]*struct {
-			Remote string
-			Origin string
-			Merge string
-		}
-        Remote map[string]*struct {
-                Url string
-				Fetch string
-				Merge string
-        }
-}
 
-
-// Tries to parse the ./.git/config file to find the atlas project name
 func GetGitInfo() string {
 	
-	c := Config{}
 	
-	_, err := os.Stat("./.git/config")
+	// Read in the gitconfig file
+    file, err := os.Open("./.git/config")
 	if err != nil {
-	    log.Fatal("You're not in a git directory.")
+		log.Println("Can't find the project.  Use the -p option to specifiy the project you want to build.")
+	    log.Fatal(err)		
 	}
+    defer file.Close()
 	
-	err = gcfg.ReadFileInto(&c, "./.git/config")
-	if err != nil {
-		log.Print(err)
-		log.Fatal("Can't parse .git/config")
-	}
-	
-	// look through each remote and return the one that points to an atlas project
-	project := ""
-	for _,c := range c.Remote {
-		if c.Url[:3] == "git" {
-			repo := strings.Split(c.Url,":")
-			if len(repo) == 2 {
-				host := strings.Split(repo[0],"@")[1]
-				if host == "git.atlas.oreilly.com" {
-					project = strings.Split(repo[1],".")[0]
-					break
-				}
-			}
-			
+	// find the first reference to an atlas repository
+	remote := ""
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+		for _,s := range strings.Split(scanner.Text()," ") {
+			if strings.Contains(s, "git@git.atlas.oreilly.com") {
+	        	remote = s	
+				break
+			}			
 		}
+    }
+
+	// Error our if we can't find anything
+	if remote == "" {
+        log.Fatal("Cannot find an atlas remote in the git config file.  Use the -p option to suppy one directly.")
+    }
+	
+	// Assuming we found the remote, parse out just the username and project, which will look like this:
+	//    git@git.atlas.oreilly.com:odewahn/ost-python.git
+	
+	repo := strings.Split(remote,":")
+	if len(repo) !=2 {
+        log.Fatal("Cannot find an atlas remote in the git config file.  Use the -p option to suppy one directly.")		
 	}
 	
-	if len(project) == 0 {
-		log.Fatal("Can't find any remotes for git.atlas.oreilly.com.")
+	ret_val := repo[1]
+	if strings.Contains(ret_val, ".git") {
+		ret_val = ret_val[:len(ret_val)-4]
 	}
 		
-	return project
+	return ret_val
 
 }
