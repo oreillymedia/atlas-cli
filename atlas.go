@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"os"
 )
 
@@ -82,7 +82,7 @@ func main() {
 				build := &Builds{}
 				build.Build(*atlas_user, *args)
 			},
-		},		
+		},
 		{
 			Name: "open",
 			Usage: "Open a site",

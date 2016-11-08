@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"log"
 	"github.com/toqueteos/webbrowser"
 	"net/url"
@@ -23,11 +23,11 @@ type Sites struct {
 
 //Find the first build with an HTML build
 func getBuildId(user *Credentials, project string) int {
-	
+
 	// Fetch the build data itself form the atlas api
-	builds := &ProjectBuilds{}	
+	builds := &ProjectBuilds{}
 	builds.Get(user, project)
-		
+
 	// loop though each build  and build-> status till we find the first html build
 	build_id := -1
 	for _, b := range *builds {
@@ -53,7 +53,7 @@ func getBuildId(user *Credentials, project string) int {
 
 // Gets the status of the build with the given id
 func get_state(id int) string {
-	
+
 	url := fmt.Sprintf("http://web-publisher.atlas.oreilly.com/deploy/%d", id)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -65,9 +65,9 @@ func get_state(id int) string {
 
 	var s Sites
 	err = json.Unmarshal(body, &s)
-	
+
 	return s.State
-		
+
 }
 
 
@@ -79,7 +79,7 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 	} else {
 		project = GetGitInfo()
 	}
-	
+
 	fmt.Printf("Publishing %s", project)
 
 	// Get the visibility level
@@ -87,10 +87,10 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 	if c.Bool("public") {
 		bucket_type = "public"
 	}
-	
+
 	// get the build ID
 	build_id := getBuildId(user,project)
-	
+
 	// Now hit the API endpoint to publish the build to sites
 	resp, err := http.PostForm("http://web-publisher.atlas.oreilly.com/deploy",
 		url.Values{
@@ -103,13 +103,13 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	
+
 	// Read the results from the build request
 	body, err := ioutil.ReadAll(resp.Body)
-	
+
 	var response Sites
 	json.Unmarshal(body, &response)
-	
+
 	// Now poll until the build is complete
 	for {
 		fmt.Print(".")
@@ -117,25 +117,25 @@ func (s *Sites) Publish(user *Credentials, c *cli.Context) {
 		if (state == "complete") {
 			break
 		}
-		time.Sleep(500 * time.Millisecond)		
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	s.Open(c)
-	
+
 }
 
 func (s *Sites) Open(c *cli.Context) {
-	
+
 	project := ""
 	if len(c.String("project")) > 0 {
 		project = c.String("project")
 	} else {
 		project = GetGitInfo()
 	}
-		
+
 	url := fmt.Sprintf("http://orm-static-site-proxy.herokuapp.com/%s/ch01.html", project)
 	if c.Bool("public") {
-		url = fmt.Sprintf("http://sites.oreilly.com/%s/ch01.html", project)		
+		url = fmt.Sprintf("http://sites.oreilly.com/%s/ch01.html", project)
 	}
 	fmt.Printf("Opening %s\n", url)
 	webbrowser.Open(url)
