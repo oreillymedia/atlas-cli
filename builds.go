@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -49,18 +49,18 @@ type BuildArgs struct {
 // It uses the structure defined in builds.go
 
 func (builds *ProjectBuilds) Get(user *Credentials, project string) {
-	
+
 	qry := url.Values{
 			"project":    {project},
 			"auth_token":  {user.Key},
 	}
-	
+
 	resp, err := http.Get("https://atlas.oreilly.com/api/builds?" + qry.Encode() )
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	
+
 	// Read the results from the build request
 	body, err := ioutil.ReadAll(resp.Body)
 
@@ -68,14 +68,14 @@ func (builds *ProjectBuilds) Get(user *Credentials, project string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 }
 
 
 func (args *BuildArgs) Parse(c *cli.Context) {
 
 	// the project must be the first argument
-	
+
 	if len(c.String("project")) > 0 {
 		args.Project = c.String("project")
 	} else {

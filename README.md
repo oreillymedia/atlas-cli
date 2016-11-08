@@ -2,7 +2,7 @@
 
 A Go-based Atlas API client for building projects and publishing them as a web site.
 
-Here's the top-level help: 
+Here's the top-level help:
 
 ```
 NAME:
@@ -22,7 +22,7 @@ COMMANDS:
    open		Open a site
    publish	Publish a site
    help, h	Shows a list of commands or help for one command
-   
+
 GLOBAL OPTIONS:
    --help, -h		show help
    --version, -v	print the version
@@ -37,7 +37,7 @@ GLOBAL OPTIONS:
 Someday I'll make a packager.
 
 
-## Usage 
+## Usage
 
 With this command, you can do things like this:
 
@@ -62,6 +62,7 @@ If you omit the "-p" flag, the CLI will see if it can find a project name from t
 To build, do this:
 
 ```
+go get github.com/urfave/cli github.com/mitchellh/go-homedir github.com/toqueteos/webbrowser
 go build -o atlas *.go
 ```
 
