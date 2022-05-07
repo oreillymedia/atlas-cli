@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
 	"os"
+
+	"github.com/urfave/cli"
 )
 
 // Declare package level vairables
@@ -51,7 +52,7 @@ func main() {
 			Usage: "Build a project",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name: "project, p",
+					Name:  "project, p",
 					Usage: "Project name",
 				},
 				cli.BoolFlag{
@@ -82,41 +83,41 @@ func main() {
 				build := &Builds{}
 				build.Build(*atlas_user, *args)
 			},
-		},		
+		},
 		{
-			Name: "open",
+			Name:  "open",
 			Usage: "Open a site",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name: "project, p",
+					Name:  "project, p",
 					Usage: "Project name",
 				},
 				cli.BoolFlag{
-					Name: "public",
+					Name:  "public",
 					Usage: "Make project public",
 				},
 			},
-			Action: func(c *cli.Context){
+			Action: func(c *cli.Context) {
 				s := &Sites{}
 				s.Open(c)
 			},
 		},
 		{
-			Name: "publish",
+			Name:  "publish",
 			Usage: "Publish a site",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name: "project, p",
+					Name:  "project, p",
 					Usage: "Project name",
 				},
 				cli.BoolFlag{
-					Name: "public",
+					Name:  "public",
 					Usage: "Make project public",
 				},
 			},
-			Action: func(c *cli.Context){
+			Action: func(c *cli.Context) {
 				s := &Sites{}
-				s.Publish(atlas_user , c)
+				s.Publish(atlas_user, c)
 			},
 		},
 	}

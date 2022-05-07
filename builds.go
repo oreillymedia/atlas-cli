@@ -3,16 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/urfave/cli"
 )
-
-
 
 // Defines the payload of the build API
 type Builds struct {
@@ -23,19 +22,18 @@ type Builds struct {
 		Status       string `json:"status"`
 		Download_url string `json:"download_url"`
 		Message      struct {
-			Error	string `json:"error"`
+			Error string `json:"error"`
 		} `json:"message"`
 	} `json:"status"`
 }
 
-type ProjectBuilds []struct{
+type ProjectBuilds []struct {
 	Id        int    `json:"id"`
-    CreatedAt string  `json:"created_at"`
-    Status    []struct {
-	   Format string `json:"format"`
-    } `json:"status"`
+	CreatedAt string `json:"created_at"`
+	Status    []struct {
+		Format string `json:"format"`
+	} `json:"status"`
 }
-
 
 // Hold the parameters for a build
 type BuildArgs struct {
@@ -44,23 +42,22 @@ type BuildArgs struct {
 	Branch  string
 }
 
-
 // This function returns the builds for the project
 // It uses the structure defined in builds.go
 
 func (builds *ProjectBuilds) Get(user *Credentials, project string) {
-	
+
 	qry := url.Values{
-			"project":    {project},
-			"auth_token":  {user.Key},
+		"project":    {project},
+		"auth_token": {user.Key},
 	}
-	
-	resp, err := http.Get("https://atlas.oreilly.com/api/builds?" + qry.Encode() )
+
+	resp, err := http.Get("https://atlas.oreilly.com/api/builds?" + qry.Encode())
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	
+
 	// Read the results from the build request
 	body, err := ioutil.ReadAll(resp.Body)
 
@@ -68,20 +65,18 @@ func (builds *ProjectBuilds) Get(user *Credentials, project string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-}
 
+}
 
 func (args *BuildArgs) Parse(c *cli.Context) {
 
 	// the project must be the first argument
-	
+
 	if len(c.String("project")) > 0 {
 		args.Project = c.String("project")
 	} else {
 		args.Project = GetGitInfo()
 	}
-
 
 	//process the format flags they've requested
 	formats := make([]string, 0)
@@ -129,7 +124,7 @@ func (builds *Builds) Start(c Credentials, a BuildArgs) {
 
 func (builds *Builds) Build(c Credentials, a BuildArgs) {
 
-	fmt.Printf("Building %s",a.Project)
+	fmt.Printf("Building %s", a.Project)
 
 	builds.Start(c, a)
 
